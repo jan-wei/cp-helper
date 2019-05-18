@@ -1,0 +1,11 @@
+{
+	"name": "CP-Helper",
+	"version": "1.0",
+	"description": "Personal helper for CP tasks.",
+	"manifest_version": 2,
+	"background": {
+		"scripts": ["background.js"]
+	},
+	"permissions": ["activeTab"],
+	"browser_action": {}
+}
