@@ -4,7 +4,7 @@
 	if(window.location.href.match(loadUrl)) {
 		// get the problem number
 		let urlSplit = window.location.href.split('/');
-		let number = "cf" + urlSplit[urlSplit.length - 2] + urlSplit[urlSplit.length - 1];
+		let number = urlSplit[urlSplit.length - 2] + urlSplit[urlSplit.length - 1];
 		
 		// get the proble title
 		let titleElement = document.querySelector(".title");
