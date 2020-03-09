@@ -15,6 +15,7 @@ type TestCase struct {
 }
 
 type Problem struct {
+	Platform     string     `json:"platform"`
 	Number       string     `json:"number"`
 	Title        string     `json:"title"`
 	Link         string     `json:"link"`
@@ -22,9 +23,9 @@ type Problem struct {
 	TestCases    []TestCase `json:"testCases"`
 }
 
-func compile(problemNumber string) error {
-	fullSrcPath := "\\Users\\janwe\\Documents\\src\\codeforces\\problems\\" + problemNumber + ".cpp"
-	fullBinPath := "\\Users\\janwe\\Documents\\src\\codeforces\\bin\\" + problemNumber
+func compile(platform, problemNumber string) error {
+	fullSrcPath := fmt.Sprintf("\\Users\\janwe\\Documents\\src\\%s\\problems\\%s.cpp", platform, problemNumber)
+	fullBinPath := fmt.Sprintf("\\Users\\janwe\\Documents\\src\\%s\\bin\\%s", platform, problemNumber)
 
 	args := []string{"-std=c++17", fullSrcPath, "-o", fullBinPath}
 
@@ -49,8 +50,8 @@ func compile(problemNumber string) error {
 	return nil
 }
 
-func retrieveTestCases(problemNumber string) (*Problem, error) {
-	fullTestPath := "\\Users\\janwe\\Documents\\src\\codeforces\\tests\\" + problemNumber + "_test.json"
+func retrieveTestCases(platform, problemNumber string) (*Problem, error) {
+	fullTestPath := fmt.Sprintf("\\Users\\janwe\\Documents\\src\\%s\\tests\\%s_test.json", platform, problemNumber)
 
 	fmt.Printf("Retrieving test cases from %s...\n", fullTestPath)
 
@@ -83,11 +84,14 @@ func retrieveTestCases(problemNumber string) (*Problem, error) {
 
 	fmt.Printf("Test cases retrieved!\n\n")
 
+	// populate platform
+	problem.Platform = platform
+
 	return &problem, nil
 }
 
 func runTestCases(problem *Problem) error {
-	fullBinPath := "\\Users\\janwe\\Documents\\src\\codeforces\\bin\\" + problem.Number
+	fullBinPath := fmt.Sprintf("\\Users\\janwe\\Documents\\src\\%s\\bin\\%s", problem.Platform, problem.Number)
 
 	fmt.Println("Running test cases...\n")
 
@@ -130,29 +134,35 @@ func runTestCases(problem *Problem) error {
 }
 
 func main() {
-	if len(os.Args) < 2 {
-		fmt.Println("judge: Please specify a problem to judge")
+	if len(os.Args) < 3 {
+		fmt.Println("judge: Please specify the platform and problem to judge")
 		os.Exit(1)
 	}
 
-	input := os.Args[1]
+	platform := os.Args[1]
+	input := os.Args[2]
+
+	if platform != "codeforces" && platform != "atcoder" {
+		fmt.Println("judge: Platform not supported")
+		os.Exit(1)
+	}
 
 	compileFile := true
-	if len(os.Args) > 2 && os.Args[2] == "-nc" {
+	if len(os.Args) > 3 && os.Args[3] == "-nc" {
 		compileFile = false
 	}
 
 	var err error
 
 	if compileFile {
-		err = compile(input)
+		err = compile(platform, input)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
 	}
 
-	problem, err := retrieveTestCases(input)
+	problem, err := retrieveTestCases(platform, input)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

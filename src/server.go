@@ -32,6 +32,7 @@ type TestCase struct {
 }
 
 type Problem struct {
+	Platform     string     `json:"platform"`
 	Number       string     `json:"number"`
 	Title        string     `json:"title"`
 	Link         string     `json:"link"`
@@ -71,7 +72,7 @@ func CreateNewProblem(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// create a new test case file to hold the test cases
-	const cpTestFilesDir = "\\Users\\janwe\\Documents\\src\\codeforces\\tests\\"
+	cpTestFilesDir := fmt.Sprintf("\\Users\\janwe\\Documents\\src\\%s\\tests\\", problem.Platform)
 	testFileName := problem.Number + "_test.json"
 	testFilePath := cpTestFilesDir + testFileName
 	newTestFile, err := os.Create(testFilePath)
@@ -94,21 +95,20 @@ func CreateNewProblem(w http.ResponseWriter, r *http.Request) {
 	// create the problem's template
 	titleComment := "// Problem Title : " + problem.Title
 	linkComment := "// Link : " + problem.Link
-	authorComment := "// Author : janwei"
 
 	now := time.Now()
 	formattedTime := fmt.Sprintf("%02d-%02d-%d %02d:%02d:%02d", now.Month(), now.Day(), now.Year(), now.Hour(), now.Minute(), now.Second())
 
 	dateComment := "// Date : " + formattedTime
 
-	comments := titleComment + "\n" + linkComment + "\n" + authorComment + "\n" + dateComment + "\n\n"
+	comments := titleComment + "\n" + linkComment + "\n" + dateComment + "\n\n"
 
 	// add comment to cpTemplate
 	fullTemplate := comments + cpTemplate
 
 	// create a new source file to write the template to
 	// this file is where the problem would be coded in
-	const cpSrcFilesDir = "\\Users\\janwe\\Documents\\src\\codeforces\\problems\\"
+	cpSrcFilesDir := fmt.Sprintf("\\Users\\janwe\\Documents\\src\\%s\\problems\\", problem.Platform)
 	srcFileName := problem.Number + ".cpp"
 	srcFilePath := cpSrcFilesDir + srcFileName
 	newSrcFile, err := os.Create(srcFilePath)
